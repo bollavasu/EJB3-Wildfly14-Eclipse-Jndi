@@ -1,0 +1,76 @@
+
+http://www.ejbtutorial.com/j2ee/tutorial-how-to-invoke-an-ejb-from-java-application-client-using-wildfly-and-eclipse
+
+1)Create a EJB Project
+  New -> EJB Project -> VasuEjbProject -> Finish
+  
+2)Create a stateless session bean
+  right click on ejbModule -> New -> Session Bean -> give package name -> give Session bean name -> Check Remote (Un-Check No-interface View) -> Finish
+  
+3)add a method in Remote interface
+
+  public String sayHello();
+  
+4)add method implementation in Bean class
+
+  public String sayHello() {	
+    return "HELLO VASU, HOW ARE YOU ? ";
+  }
+  
+5)Deploy EJB project to Wildfly
+
+  right click on VasuEjbProject -> Run As -> Run on server -> select Wildfly 14
+  
+6)Export EJB Jar file to a folder
+
+  right click on VasuEjbProject -> export -> EJB jar file -> select destination folder
+  
+7)Create a Java Project (EJB client)
+
+8)add VasuEjbProject.jar and jboss-client.jar (Wildfly bin/client folder) in  Build path Libraries
+
+  right click on Java Project -> Build Path -> Configure Build Path -> Libraries -> Add External Jars
+  
+9)create a Java class and add the following code
+  
+	import java.util.*;
+	import javax.naming.*;
+	import javax.ejb.*;
+	import com.vasu.HelloWorld;
+	import com.vasu.HelloWorldBean;
+
+  public class VasuTest {
+	public static void main(String[] args) {           
+		try{   
+			System.out.println("Hello From EJB Client...");
+		    Properties props = new Properties();
+	        props.put("java.naming.factory.url.pkgs","org.jboss.ejb.client.naming");
+	        InitialContext context = new InitialContext(props);
+ 
+	        String appName = "";        	 
+	        String moduleName = "VasuEjbProject";
+	        String distinctName = "";        	 
+	        String beanName = HelloWorldBean.class.getSimpleName();        	 
+	        String interfaceName = HelloWorld.class.getName();
+	        String name = "ejb:" + appName + "/" + moduleName + "/" +  distinctName    + "/" + beanName + "!" + interfaceName;
+	        System.out.println(name);
+	        HelloWorld bean = (HelloWorld)context.lookup(name);
+	        String result=bean.sayHello();
+	        System.out.println("Result From EJB is :"+result); 	        
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+ }
+
+10)create jboss-ejb-client.properties file in src folder in Java project and add the following
+
+	remote.connections=default
+	remote.connection.default.host=localhost
+	remote.connection.default.port=8080
+	remote.connection.default.connect.options.org.xnio.Options.SASL_POLICY_NOANONYMOUS=false
+	
+11)Run the client class
+   right click on VasuTest.java -> Run As -> Java Application
+
+  
